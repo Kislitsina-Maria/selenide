@@ -1,11 +1,8 @@
-import com.codeborne.selenide.conditions.Visible;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.text.SimpleDateFormat;
 import java.time.Duration;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
@@ -13,55 +10,35 @@ import static com.codeborne.selenide.Selenide.*;
 
 public class TestOderCard {
 
-    //java -jar artifacts/app-card-delivery.jar -port=7777
-
-
-    @BeforeEach
-   void setDate() {
-        Calendar calc = GregorianCalendar.getInstance();
-        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
+    public String generateDate(int days) {
+        return LocalDate.now().plusDays(days).format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
     }
-
-
-
-
-
-
 
 
     @Test
     void shouldTest() {
 
-        Calendar calc = GregorianCalendar.getInstance();
-        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
-        calc.add(Calendar.DATE, 4);
-        String date = formatter.format(calc.getTime());
 
         open("http://localhost:7777");
         $("[placeholder=\"Город\"]").setValue("Самара");
-        $("input[placeholder=\"Дата встречи\"]").clear();
-        $("input[placeholder=\"Дата встречи\"]").doubleClick().sendKeys(date);
+        String planningDate = generateDate(4);
+        $("input[placeholder=\"Дата встречи\"]").doubleClick().sendKeys(planningDate);
         $("[name=\"name\"]").setValue("Инесса Рюриковна");
         $("[name=\"phone\"]").setValue("+79340248197");
         $("[class=\"checkbox__box\"]").click();
         $("[class=\"button__content\"]").click();
 
         $x("//*[contains(text(),\"Успешно!\")]").should(visible, Duration.ofSeconds(15));
-        $x("//*[contains(text(),\"Встреча успешно забронирована на\")]");
-        $x("//*[contains(text(),\"05.11.2022\")]");
+        $(".notification__content").shouldHave(text("Встреча успешно забронирована на " + planningDate));
     }
 
     @Test
     void wrongCity() {
 
-        Calendar calc = GregorianCalendar.getInstance();
-        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
-        calc.add(Calendar.DATE, 4);
-        String date = formatter.format(calc.getTime());
-
         open("http://localhost:7777");
         $("[placeholder=\"Город\"]").setValue("Суздаль");
-        $("input[placeholder=\"Дата встречи\"]").doubleClick().sendKeys(date);
+        String planningDate = generateDate(4);
+        $("input[placeholder=\"Дата встречи\"]").doubleClick().sendKeys(planningDate);
         $("[name=\"name\"]").setValue("Инесса Рюриковна");
         $("[name=\"phone\"]").setValue("+79340248197");
         $("[class=\"checkbox__box\"]").click();
@@ -72,14 +49,12 @@ public class TestOderCard {
 
     @Test
     void englishCity() {
-        Calendar calc = GregorianCalendar.getInstance();
-        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
-        calc.add(Calendar.DATE, 4);
-        String date = formatter.format(calc.getTime());
+
 
         open("http://localhost:7777");
         $("[placeholder=\"Город\"]").setValue("Moscow");
-        $("input[placeholder=\"Дата встречи\"]").doubleClick().sendKeys(date);
+        String planningDate = generateDate(4);
+        $("input[placeholder=\"Дата встречи\"]").doubleClick().sendKeys(planningDate);
         $("[name=\"name\"]").setValue("Инесса Рюриковна");
         $("[name=\"phone\"]").setValue("+79340248197");
         $("[class=\"checkbox__box\"]").click();
@@ -90,14 +65,12 @@ public class TestOderCard {
 
     @Test
     void cityWithNumber() {
-        Calendar calc = GregorianCalendar.getInstance();
-        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
-        calc.add(Calendar.DATE, 4);
-        String date = formatter.format(calc.getTime());
+
 
         open("http://localhost:7777");
         $("[placeholder=\"Город\"]").setValue("Москва 2");
-        $("input[placeholder=\"Дата встречи\"]").doubleClick().sendKeys(date);
+        String planningDate = generateDate(4);
+        $("input[placeholder=\"Дата встречи\"]").doubleClick().sendKeys(planningDate);
         $("[name=\"name\"]").setValue("Инесса Рюриковна");
         $("[name=\"phone\"]").setValue("+79340248197");
         $("[class=\"checkbox__box\"]").click();
@@ -108,13 +81,11 @@ public class TestOderCard {
 
     @Test
     void withoutCity() {
-        Calendar calc = GregorianCalendar.getInstance();
-        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
-        calc.add(Calendar.DATE, 4);
-        String date = formatter.format(calc.getTime());
+
 
         open("http://localhost:7777");
-        $("input[placeholder=\"Дата встречи\"]").doubleClick().sendKeys(date);
+        String planningDate = generateDate(4);
+        $("input[placeholder=\"Дата встречи\"]").doubleClick().sendKeys(planningDate);
         $("[name=\"name\"]").setValue("Инесса Рюриковна");
         $("[name=\"phone\"]").setValue("+79340248197");
         $("[class=\"checkbox__box\"]").click();
@@ -122,16 +93,15 @@ public class TestOderCard {
 
         $x("//*[contains(text(),\"Поле обязательно для заполнения\")]");
     }
+
     @Test
     void lastDayMeeting() {
-        Calendar calc = GregorianCalendar.getInstance();
-        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
-        calc.add(Calendar.DATE, -1);
-        String date = formatter.format(calc.getTime());
+
 
         open("http://localhost:7777");
         $("[placeholder=\"Город\"]").setValue("Краснодар");
-        $("input[placeholder=\"Дата встречи\"]").doubleClick().sendKeys(date);
+        String planningDate = generateDate(-1);
+        $("input[placeholder=\"Дата встречи\"]").doubleClick().sendKeys(planningDate);
         $("[name=\"name\"]").setValue("Инесса Рюриковна");
         $("[name=\"phone\"]").setValue("+79340248197");
         $("[class=\"checkbox__box\"]").click();
@@ -142,13 +112,11 @@ public class TestOderCard {
 
     @Test
     void todayMeeting() {
-        Calendar calc = GregorianCalendar.getInstance();
-        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
-        String date = formatter.format(calc.getTime());
 
         open("http://localhost:7777");
         $("[placeholder=\"Город\"]").setValue("Пенза");
-        $("input[placeholder=\"Дата встречи\"]").doubleClick().sendKeys(date);
+        String planningDate = generateDate(0);
+        $("input[placeholder=\"Дата встречи\"]").doubleClick().sendKeys(planningDate);
         $("[name=\"name\"]").setValue("Инесса Рюриковна");
         $("[name=\"phone\"]").setValue("+79340248197");
         $("[class=\"checkbox__box\"]").click();
@@ -159,14 +127,12 @@ public class TestOderCard {
 
     @Test
     void tomorrowMeeting() {
-        Calendar calc = GregorianCalendar.getInstance();
-        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
-        calc.add(Calendar.DATE, 1);
-        String date = formatter.format(calc.getTime());
+
 
         open("http://localhost:7777");
         $("[placeholder=\"Город\"]").setValue("Биробиджан");
-        $("input[placeholder=\"Дата встречи\"]").doubleClick().sendKeys(date);
+        String planningDate = generateDate(1);
+        $("input[placeholder=\"Дата встречи\"]").doubleClick().sendKeys(planningDate);
         $("[name=\"name\"]").setValue("Инесса Рюриковна");
         $("[name=\"phone\"]").setValue("+79340248197");
         $("[class=\"checkbox__box\"]").click();
@@ -177,14 +143,11 @@ public class TestOderCard {
 
     @Test
     void twoDaysMeeting() {
-        Calendar calc = GregorianCalendar.getInstance();
-        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
-        calc.add(Calendar.DATE, 2);
-        String date = formatter.format(calc.getTime());
 
         open("http://localhost:7777");
         $("[placeholder=\"Город\"]").setValue("Тамбов");
-        $("input[placeholder=\"Дата встречи\"]").doubleClick().sendKeys(date);
+        String planningDate = generateDate(2);
+        $("input[placeholder=\"Дата встречи\"]").doubleClick().sendKeys(planningDate);
         $("[name=\"name\"]").setValue("Инесса Рюриковна");
         $("[name=\"phone\"]").setValue("+79340248197");
         $("[class=\"checkbox__box\"]").click();
@@ -195,14 +158,11 @@ public class TestOderCard {
 
     @Test
     void threeDaysMeeting() {
-        Calendar calc = GregorianCalendar.getInstance();
-        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
-        calc.add(Calendar.DATE, 3);
-        String date = formatter.format(calc.getTime());
 
         open("http://localhost:7777");
         $("[placeholder=\"Город\"]").setValue("Кемерово");
-        $("input[placeholder=\"Дата встречи\"]").doubleClick().sendKeys(date);
+        String planningDate = generateDate(3);
+        $("input[placeholder=\"Дата встречи\"]").doubleClick().sendKeys(planningDate);
         $("[name=\"name\"]").setValue("Инесса Рюриковна");
         $("[name=\"phone\"]").setValue("+79340248197");
         $("[class=\"checkbox__box\"]").click();
@@ -213,32 +173,25 @@ public class TestOderCard {
 
     @Test
     void nameWithNumber() {
-        Calendar calc = GregorianCalendar.getInstance();
-        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
-        calc.add(Calendar.DATE, 5);
-        String date = formatter.format(calc.getTime());
 
         open("http://localhost:7777");
         $("[placeholder=\"Город\"]").setValue("Кострома");
-        $("input[placeholder=\"Дата встречи\"]").doubleClick().sendKeys(date);
+        String planningDate = generateDate(5);
+        $("input[placeholder=\"Дата встречи\"]").doubleClick().sendKeys(planningDate);
         $("[name=\"name\"]").setValue("Инесса 3");
         $("[name=\"phone\"]").setValue("+79340248197");
         $("[class=\"checkbox__box\"]").click();
         $("[class=\"button__content\"]").click();
-
         $x("//*[contains(text(),\"Имя и Фамилия указаные неверно. Допустимы только русские буквы, пробелы и дефисы.\"]");
     }
 
     @Test
     void englishName() {
-        Calendar calc = GregorianCalendar.getInstance();
-        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
-        calc.add(Calendar.DATE, 5);
-        String date = formatter.format(calc.getTime());
 
         open("http://localhost:7777");
         $("[placeholder=\"Город\"]").setValue("Салехард");
-        $("input[placeholder=\"Дата встречи\"]").doubleClick().sendKeys(date);
+        String planningDate = generateDate(5);
+        $("input[placeholder=\"Дата встречи\"]").doubleClick().sendKeys(planningDate);
         $("[name=\"name\"]").setValue("Inessa Vladimirovna");
         $("[name=\"phone\"]").setValue("+79340248197");
         $("[class=\"checkbox__box\"]").click();
@@ -249,34 +202,28 @@ public class TestOderCard {
 
     @Test
     void doubleName() {
-        Calendar calc = GregorianCalendar.getInstance();
-        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
-        calc.add(Calendar.DATE, 5);
-        String date = formatter.format(calc.getTime());
 
         open("http://localhost:7777");
         $("[placeholder=\"Город\"]").setValue("Санкт-Петербург");
-        $("input[placeholder=\"Дата встречи\"]").doubleClick().sendKeys(date);
+        String planningDate = generateDate(5);
+        $("input[placeholder=\"Дата встречи\"]").doubleClick().sendKeys(planningDate);
         $("[name=\"name\"]").setValue("Анна-Мария Рюриковна");
         $("[name=\"phone\"]").setValue("+79340248197");
         $("[class=\"checkbox__box\"]").click();
         $("[class=\"button__content\"]").click();
 
         $x("//*[contains(text(),\"Успешно!\")]").should(visible, Duration.ofSeconds(15));
-        $x("//*[contains(text(),\"Встреча успешно забронирована на\")]");
-        $x("//*[contains(text(),\"05.11.2022\")]");
+        $(".notification__content").shouldHave(text("Встреча успешно забронирована на " + planningDate));
     }
 
     @Test
     void withoutName() {
-        Calendar calc = GregorianCalendar.getInstance();
-        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
-        calc.add(Calendar.DATE, 5);
-        String date = formatter.format(calc.getTime());
+
 
         open("http://localhost:7777");
         $("[placeholder=\"Город\"]").setValue("Киров");
-        $("input[placeholder=\"Дата встречи\"]").doubleClick().sendKeys(date);
+        String planningDate = generateDate(5);
+        $("input[placeholder=\"Дата встречи\"]").doubleClick().sendKeys(planningDate);
         $("[name=\"phone\"]").setValue("+79340248197");
         $("[class=\"checkbox__box\"]").click();
         $("[class=\"button__content\"]").click();
@@ -286,14 +233,12 @@ public class TestOderCard {
 
     @Test
     void withoutPhone() {
-        Calendar calc = GregorianCalendar.getInstance();
-        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
-        calc.add(Calendar.DATE, 5);
-        String date = formatter.format(calc.getTime());
+
 
         open("http://localhost:7777");
         $("[placeholder=\"Город\"]").setValue("Киров");
-        $("input[placeholder=\"Дата встречи\"]").doubleClick().sendKeys(date);
+        String planningDate = generateDate(5);
+        $("input[placeholder=\"Дата встречи\"]").doubleClick().sendKeys(planningDate);
         $("[name=\"name\"]").setValue("Анна Рюриковна");
         $("[class=\"checkbox__box\"]").click();
         $("[class=\"button__content\"]").click();
@@ -303,14 +248,11 @@ public class TestOderCard {
 
     @Test
     void phoneNumberWithEight() {
-        Calendar calc = GregorianCalendar.getInstance();
-        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
-        calc.add(Calendar.DATE, 5);
-        String date = formatter.format(calc.getTime());
 
         open("http://localhost:7777");
         $("[placeholder=\"Город\"]").setValue("Киров");
-        $("input[placeholder=\"Дата встречи\"]").doubleClick().sendKeys(date);
+        String planningDate = generateDate(5);
+        $("input[placeholder=\"Дата встречи\"]").doubleClick().sendKeys(planningDate);
         $("[name=\"name\"]").setValue("Анна Рюриковна");
         $("[name=\"phone\"]").setValue("89340248197");
         $("[class=\"checkbox__box\"]").click();
@@ -321,14 +263,11 @@ public class TestOderCard {
 
     @Test
     void phoneNumberMore() {
-        Calendar calc = GregorianCalendar.getInstance();
-        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
-        calc.add(Calendar.DATE, 5);
-        String date = formatter.format(calc.getTime());
 
         open("http://localhost:7777");
         $("[placeholder=\"Город\"]").setValue("Киров");
-        $("input[placeholder=\"Дата встречи\"]").doubleClick().sendKeys(date);
+        String planningDate = generateDate(5);
+        $("input[placeholder=\"Дата встречи\"]").doubleClick().sendKeys(planningDate);
         $("[name=\"name\"]").setValue("Анна Рюриковна");
         $("[name=\"phone\"]").setValue("+793402481975");
         $("[class=\"checkbox__box\"]").click();
@@ -339,14 +278,11 @@ public class TestOderCard {
 
     @Test
     void phoneNumberLess() {
-        Calendar calc = GregorianCalendar.getInstance();
-        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
-        calc.add(Calendar.DATE, 5);
-        String date = formatter.format(calc.getTime());
 
         open("http://localhost:7777");
         $("[placeholder=\"Город\"]").setValue("Киров");
-        $("input[placeholder=\"Дата встречи\"]").doubleClick().sendKeys(date);
+        String planningDate = generateDate(5);
+        $("input[placeholder=\"Дата встречи\"]").doubleClick().sendKeys(planningDate);
         $("[name=\"name\"]").setValue("Анна Рюриковна");
         $("[name=\"phone\"]").setValue("+7934024819");
         $("[class=\"checkbox__box\"]").click();
@@ -357,24 +293,17 @@ public class TestOderCard {
 
     @Test
     void withoutAgreement() {
-        Calendar calc = GregorianCalendar.getInstance();
-        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
-        calc.add(Calendar.DATE, 5);
-        String date = formatter.format(calc.getTime());
 
         open("http://localhost:7777");
         $("[placeholder=\"Город\"]").setValue("Киров");
-        $("input[placeholder=\"Дата встречи\"]").doubleClick().sendKeys(date);
+        String planningDate = generateDate(5);
+        $("input[placeholder=\"Дата встречи\"]").doubleClick().sendKeys(planningDate);
         $("[name=\"name\"]").setValue("Анна Рюриковна");
         $("[name=\"phone\"]").setValue("+79340248197");
         $("[class=\"button__content\"]").click();
 
         $("[data-test-id=\"agreement\"].input_invalid").should(text("Я соглашаюсь с условиями обработки и использования моих персональных данных"));
     }
-
-
-
-
 
 
 }
